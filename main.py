@@ -6,8 +6,8 @@ try:
 except Exception as e:
     ai_router = None
 app = FastAPI()
-@app.get("/")
+@app.get('/')
 async def root():
-    return {"status": "online", "v": "v06-39", "router": ai_router is not None}
+    return {'status': 'online', 'v': 'v08-29', 'router': ai_router is not None}
 if ai_router:
-    app.include_router(ai_router, prefix="/ai")
+    app.include_router(ai_router, prefix='/ai')
