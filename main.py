@@ -1,11 +1,16 @@
 ﻿from fastapi import FastAPI
-from app.api import ai
 import os
+try:
+    from app.api.ai import router as ai_router
+except ImportError as e:
+    print(f'IMPORT ERROR: {e}')
+    ai_router = None
 
-app = FastAPI(title="FastAI Backend")
+app = FastAPI(title='FastAI Backend')
 
-@app.get("/")
+@app.get('/')
 async def health():
-    return {"status": "online", "db": "connected"}
+    return {'status': 'online', 'db': 'connected', 'router_loaded': ai_router is not None}
 
-app.include_router(ai.router, prefix="/ai", tags=["AI"])
+if ai_router:
+    app.include_router(ai_router, prefix='/ai', tags=['AI'])
