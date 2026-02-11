@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.models.task import AITask
 from app.worker.celery_app import process_ai_prompt
@@ -25,7 +25,7 @@ async def create_task(prompt: str, db: Session = Depends(get_db)):
     new_task = AITask(task_id=task_id, prompt=prompt, status="queued")
     db.add(new_task)
     db.commit()
-    process_ai_prompt.delay(prompt)
+    process_ai_prompt.delay(prompt, task_id)
     return {"task_id": task_id, "status": "queued"}
 
 @router.get("/status/{task_id}")
