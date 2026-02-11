@@ -4,7 +4,7 @@ on:
     branches: [ "main" ]
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: fast-ai-backend
+  ECR_REPOSITORY: fast-ai-worker
   ECS_SERVICE: fast-ai-service
   ECS_CLUSTER: marvelous-ostrich-uah0xp
 jobs:
