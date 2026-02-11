@@ -11,3 +11,5 @@ async def root():
     return {'status': 'online', 'v': 'v08-29', 'router': ai_router is not None}
 if ai_router:
     app.include_router(ai_router, prefix='/ai')
+
+# FORCE_REBUILD: FINAL-SYNC-11-07
