@@ -1,0 +1,33 @@
+{
+    "family": "fast-ai-task",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "web",
+            "image": "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest",
+            "cpu": 256,
+            "memory": 512,
+            "portMappings": [{ "containerPort": 8000, "hostPort": 8000 }],
+            "essential": true
+        },
+        {
+            "name": "worker",
+            "image": "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-worker:latest",
+            "cpu": 256,
+            "memory": 512,
+            "essential": true
+        },
+        {
+            "name": "redis",
+            "image": "redis:alpine",
+            "cpu": 256,
+            "memory": 512,
+            "essential": true
+        }
+    ],
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "1024",
+    "memory": "2048",
+    "executionRoleArn": "arn:aws:iam::/fastAiEcsExecutionRole",
+    "taskRoleArn": "arn:aws:iam::/fastAiEcsExecutionRole"
+}

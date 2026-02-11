@@ -1,0 +1,55 @@
+{
+    "family": "fast-ai-task",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "1024",
+    "memory": "3072",
+    "executionRoleArn": "arn:aws:iam::905418237004:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::905418237004:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "redis",
+            "image": "redis/redis-stack-server:latest",
+            "essential": true,
+            "portMappings": [{"containerPort": 6379}]
+        },
+        {
+            "name": "web",
+            "image": "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest",
+            "essential": true,
+            "portMappings": [{"containerPort": 8000, "protocol": "tcp"}],
+            "environment": [
+                {"name": "REDIS_URL", "value": "redis://localhost:6379/0"},
+                {"name": "DATABASE_URL", "value": "postgresql://postgres:9f[z*OTnPKc18Hls2UOS(9lkA<_H@database-1.clkq0yg2irte.eu-north-1.rds.amazonaws.com:5432/postgres"}
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/fast-ai-task",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs",
+                    "awslogs-create-group": "true"
+                }
+            }
+        },
+        {
+            "name": "worker",
+            "image": "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest",
+            "essential": true,
+            "entryPoint": ["celery", "-A", "main.celery", "worker", "--loglevel=info"],
+            "environment": [
+                {"name": "CELERY_BROKER_URL", "value": "redis://127.0.0.1:6379/0"},
+                {"name": "DATABASE_URL", "value": "postgresql://postgres:9f[z*OTnPKc18Hls2UOS(9lkA<_H@database-1.clkq0yg2irte.eu-north-1.rds.amazonaws.com:5432/postgres"}
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/fast-ai-task",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs",
+                    "awslogs-create-group": "true"
+                }
+            }
+        }
+    ]
+}

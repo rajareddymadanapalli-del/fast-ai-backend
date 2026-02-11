@@ -1,0 +1,129 @@
+{
+    "containerDefinitions":  [
+                                 {
+                                     "name":  "redis",
+                                     "image":  "905418237004.dkr.ecr.us-east-1.amazonaws.com/",
+                                     "cpu":  0,
+                                     "portMappings":  [
+                                                          {
+                                                              "containerPort":  6379,
+                                                              "hostPort":  6379,
+                                                              "protocol":  "tcp"
+                                                          }
+                                                      ],
+                                     "essential":  true,
+                                     "environment":  [
+
+                                                     ],
+                                     "mountPoints":  [
+
+                                                     ],
+                                     "volumesFrom":  [
+
+                                                     ],
+                                     "systemControls":  [
+
+                                                        ]
+                                 },
+                                 {
+                                     "name":  "web",
+                                     "image":  "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest",
+                                     "cpu":  0,
+                                     "portMappings":  [
+                                                          {
+                                                              "containerPort":  8000,
+                                                              "hostPort":  8000,
+                                                              "protocol":  "tcp"
+                                                          }
+                                                      ],
+                                     "essential":  true,
+                                     "environment":  [
+                                                         {
+                                                             "name":  "REDIS_URL",
+                                                             "value":  "redis://localhost:6379/0"
+                                                         },
+                                                         {
+                                                             "name":  "DATABASE_URL",
+                                                             "value":  "postgresql://postgres:9f[z*OTnPKc18Hls2UOS(9lkA\u003c_H@database-1.clkq0yg2irte.eu-north-1.rds.amazonaws.com:5432/postgres"
+                                                         }
+                                                     ],
+                                     "mountPoints":  [
+
+                                                     ],
+                                     "volumesFrom":  [
+
+                                                     ],
+                                     "logConfiguration":  {
+                                                              "logDriver":  "awslogs",
+                                                              "options":  {
+                                                                              "awslogs-group":  "/ecs/fast-ai-task",
+                                                                              "awslogs-create-group":  "true",
+                                                                              "awslogs-region":  "us-east-1",
+                                                                              "awslogs-stream-prefix":  "ecs"
+                                                                          }
+                                                          },
+                                     "systemControls":  [
+
+                                                        ]
+                                 },
+                                 {
+                                     "name":  "worker",
+                                     "image":  "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest",
+                                     "cpu":  0,
+                                     "portMappings":  [
+
+                                                      ],
+                                     "essential":  true,
+                                     "entryPoint":  [
+                                                        "celery",
+                                                        "-A",
+                                                        "main.celery",
+                                                        "worker",
+                                                        "--loglevel=info"
+                                                    ],
+                                     "environment":  [
+                                                         {
+                                                             "name":  "CELERY_BROKER_URL",
+                                                             "value":  "redis://127.0.0.1:6379/0"
+                                                         },
+                                                         {
+                                                             "name":  "DATABASE_URL",
+                                                             "value":  "postgresql://postgres:9f[z*OTnPKc18Hls2UOS(9lkA\u003c_H@database-1.clkq0yg2irte.eu-north-1.rds.amazonaws.com:5432/postgres"
+                                                         }
+                                                     ],
+                                     "mountPoints":  [
+
+                                                     ],
+                                     "volumesFrom":  [
+
+                                                     ],
+                                     "logConfiguration":  {
+                                                              "logDriver":  "awslogs",
+                                                              "options":  {
+                                                                              "awslogs-group":  "/ecs/fast-ai-task",
+                                                                              "awslogs-create-group":  "true",
+                                                                              "awslogs-region":  "us-east-1",
+                                                                              "awslogs-stream-prefix":  "ecs"
+                                                                          }
+                                                          },
+                                     "systemControls":  [
+
+                                                        ]
+                                 }
+                             ],
+    "family":  "fast-ai-task",
+    "taskRoleArn":  "arn:aws:iam::905418237004:role/ecsTaskExecutionRole",
+    "executionRoleArn":  "arn:aws:iam::905418237004:role/ecsTaskExecutionRole",
+    "networkMode":  "awsvpc",
+    "volumes":  [
+
+                ],
+    "placementConstraints":  [
+
+                             ],
+    "requiresCompatibilities":  [
+                                    "FARGATE"
+                                ],
+    "cpu":  "1024",
+    "memory":  "3072"
+}

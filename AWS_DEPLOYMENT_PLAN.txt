@@ -1,0 +1,6 @@
+AWS Infrastructure Plan:
+------------------------
+1. API Gateway: REST API type, pointing to ALB.
+2. ALB: Internet-facing, Listener on Port 80/443.
+3. Target Group: Points to Nginx container on Port 80.
+4. Health Check: Path '/health' (configured in Nginx).

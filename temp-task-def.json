@@ -1,0 +1,76 @@
+﻿{
+    "executionRoleArn":  "arn:aws:iam::905418237004:role/ecsTaskExecutionRole",
+    "networkMode":  "awsvpc",
+    "cpu":  "1024",
+    "requiresCompatibilities":  [
+                                    "FARGATE"
+                                ],
+    "containerDefinitions":  [
+                                 {
+                                     "portMappings":  [
+                                                          {
+                                                              "containerPort":  6379
+                                                          }
+                                                      ],
+                                     "name":  "redis",
+                                     "essential":  true,
+                                     "image":  "redis/redis-stack-server:latest"
+                                 },
+                                 {
+                                     "name":  "web",
+                                     "logConfiguration":  {
+                                                              "logDriver":  "awslogs",
+                                                              "options":  {
+                                                                              "awslogs-region":  "us-east-1",
+                                                                              "awslogs-stream-prefix":  "ecs",
+                                                                              "awslogs-create-group":  "true",
+                                                                              "awslogs-group":  "/ecs/fast-ai-task"
+                                                                          }
+                                                          },
+                                     "environment":  [
+                                                         {
+                                                             "value":  "redis://localhost:6379/0",
+                                                             "name":  "REDIS_URL"
+                                                         }
+                                                     ],
+                                     "essential":  true,
+                                     "image":  "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest",
+                                     "portMappings":  [
+                                                          {
+                                                              "protocol":  "tcp",
+                                                              "containerPort":  8000
+                                                          }
+                                                      ]
+                                 },
+                                 {
+                                     "name":  "worker",
+                                     "entryPoint":  [
+                                                        "celery",
+                                                        "-A",
+                                                        "main.celery",
+                                                        "worker",
+                                                        "--loglevel=info"
+                                                    ],
+                                     "environment":  [
+                                                         {
+                                                             "value":  "redis://127.0.0.1:6379/0",
+                                                             "name":  "CELERY_BROKER_URL"
+                                                         }
+                                                     ],
+                                     "essential":  true,
+                                     "logConfiguration":  {
+                                                              "logDriver":  "awslogs",
+                                                              "options":  {
+                                                                              "awslogs-region":  "us-east-1",
+                                                                              "awslogs-stream-prefix":  "ecs",
+                                                                              "awslogs-create-group":  "true",
+                                                                              "awslogs-group":  "/ecs/fast-ai-task"
+                                                                          }
+                                                          },
+                                     "image":  "905418237004.dkr.ecr.us-east-1.amazonaws.com/fast-ai-web:latest"
+                                 }
+                             ],
+    "family":  "fast-ai-task",
+    "taskRoleArn":  "arn:aws:iam::905418237004:role/ecsTaskExecutionRole",
+    "memory":  "3072"
+}
