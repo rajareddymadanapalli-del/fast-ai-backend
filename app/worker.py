@@ -1,12 +1,14 @@
 ﻿import os
 from celery import Celery
 
-# These will be provided by AWS ECS Environment Variables
-BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
-RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+# Celery configuration
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-celery_app = Celery("worker", broker=BROKER_URL, backend=RESULT_BACKEND)
+celery_app = Celery("worker", broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
-@celery_app.task(name="app.worker.heavy_lifting_task")
-def heavy_lifting_task(data: str):
-    return f"AWS Processed: {data}"
+@celery_app.task(name="create_task")
+def create_task(task_type):
+    import time
+    time.sleep(int(task_type) * 1)
+    return True
