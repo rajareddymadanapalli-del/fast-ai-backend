@@ -8,7 +8,7 @@ except Exception as e:
 app = FastAPI()
 @app.get('/')
 async def root():
-    return {'status': 'online', 'v': 'FINAL-FIX-18-29', 'router': ai_router is not None}
+    return {'status': 'online', 'v': 'WORKER-FIX-24-43', 'router': ai_router is not None}
 if ai_router:
     app.include_router(ai_router, prefix='/ai')
-# REBUILD_ID: FINAL-FIX-18-29
+# REBUILD_TAG: WORKER-FIX-24-43
