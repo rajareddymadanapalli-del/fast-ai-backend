@@ -1,22 +1,20 @@
 ﻿from fastapi import FastAPI
-from pydantic import BaseModel
-from celery import Celery
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
 import os
+
+# Sentry Setup (Error Tracking)
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+if SENTRY_DSN:
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[FastApiIntegration()])
 
 app = FastAPI()
 
-# Redis/Celery Setup
-CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-celery_app = Celery("tasks", broker=CELERY_BROKER_URL)
-
-class UserSchema(BaseModel):
-    email: str
-    password: str
-
 @app.get("/")
 async def root():
-    return {"status": "online", "cloud": "verified", "db": "available"}
+    return {"status": "online", "monitoring": "active"}
 
-@celery_app.task
-def background_notification(email: str):
-    return f"Notification sent to {email}"
+@app.get("/sentry-debug")
+async def trigger_error():
+    # This tests if Sentry captures unhandled exceptions
+    division_by_zero = 1 / 0
