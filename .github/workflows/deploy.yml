@@ -11,19 +11,27 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build and Push
+        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          # Use BuildKit for faster, clearer builds
           DOCKER_BUILDKIT=1 docker build -t $ECR_REGISTRY/fast-ai-worker:latest .
           docker push $ECR_REGISTRY/fast-ai-worker:latest
+          echo "image=$ECR_REGISTRY/fast-ai-worker:latest" >> $GITHUB_OUTPUT
+
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service --cluster marvelous-ostrich-uah0xp --service fast-ai-service --force-new-deployment --region us-east-1
