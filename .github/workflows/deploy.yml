@@ -21,6 +21,9 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Build and Push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/fast-ai-worker:latest .
-          docker push ${{ steps.login-ecr.outputs.registry }}/fast-ai-worker:latest
+          # Use BuildKit for faster, clearer builds
+          DOCKER_BUILDKIT=1 docker build -t $ECR_REGISTRY/fast-ai-worker:latest .
+          docker push $ECR_REGISTRY/fast-ai-worker:latest
