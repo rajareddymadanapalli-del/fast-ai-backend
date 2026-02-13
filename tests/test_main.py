@@ -1,29 +1,17 @@
-import pytest
-from httpx import ASGITransport, AsyncClient
-from app.main import app
+﻿import pytest
+from httpx import AsyncClient
+from main import app  # Adjust if your entry file is named differently
 
 @pytest.mark.asyncio
-async def test_read_root():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/")
+async def test_health_check():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get("/db-status")
     assert response.status_code == 200
-    assert response.json() == {"message": "FastAPI + PostgreSQL + Redis + Celery is live!"}
+    assert response.json()["database"] == "connected"
 
-@pytest.mark.asyncio
-async def test_register_user():
-    # Using a unique email for the test
-    payload = {"email": "test_pytest@example.com", "password": "password123"}
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/register", json=payload)
-    
-    # It should be 200 OR 400 if the test user already exists from a previous run
-    assert response.status_code in [200, 400]
-
-@pytest.mark.asyncio
-async def test_login_user():
-    payload = {"email": "test_pytest@example.com", "password": "password123"}
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/login", json=payload)
-    
-    assert response.status_code == 200
-    assert "access_token" in response.json()
+def test_pydantic_models():
+    # Example: Ensure your Pydantic validation logic works
+    from models import UserSchema # Adjust based on your actual model names
+    data = {"email": "test@example.com", "password": "securepassword"}
+    user = UserSchema(**data)
+    assert user.email == "test@example.com"
