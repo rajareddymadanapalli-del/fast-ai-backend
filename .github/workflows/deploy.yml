@@ -45,9 +45,17 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+            - name: Run Database Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          pip install alembic sqlalchemy psycopg2-binary
+          alembic upgrade head
+
       - name: CDK Deploy
         run: |
           npm install -g aws-cdk
           cd iac
           pip install -r requirements.txt
           cdk deploy --app "python app.py" --require-approval never
+
