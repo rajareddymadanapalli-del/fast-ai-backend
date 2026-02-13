@@ -1,23 +1,19 @@
-﻿services:
-  web:
+﻿version: '3.8'
+services:
+  api:
     build: .
-    ports:
-      - "8000:8000"
-    env_file: .env
+    ports: ["8000:8000"]
+    environment:
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
-      - db
   worker:
     build: .
-    command: celery -A app.worker worker --loglevel=info
-    env_file: .env
+    command: celery -A worker.celery_app worker --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
   redis:
-    image: redis:alpine
-  db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: fast_ai_db
+    image: redis:7-alpine
+    ports: ["6379:6379"]
